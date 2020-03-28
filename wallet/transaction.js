@@ -1,68 +1,88 @@
 const CryptoUtil = require('../crypto-util');
+const FlowCurrency = require('./flow-currency');
 
 class Transaction {
-    constructor() {
-        this.id = CryptoUtil.id();
-        this.input = null;
-    this.outputs = [];
+  constructor(senderWallet, recipient, amount) {
+    this.id = CryptoUtil.id();
+    this.output = Transaction.createOutput(senderWallet, recipient, amount);
+    this.input = Transaction.createInput(senderWallet);
   }
 
+  
   update(senderWallet, recipient, amount) {
-    const senderOutput = this.outputs.find(output => output.address === senderWallet.publicKey);
+    const senderOutput = this.output.find(output => output.address === senderWallet.publicKey);
 
-    if (amount > senderOutput.amount) {
+    if (amount > senderOutput.ledgerEntry.token) {
       console.log(`Amount: ${amount} exceeds balance.`);
       return;
     }
 
-    senderOutput.amount = senderOutput.amount - amount;
-    this.outputs.push({ amount, address: recipient });
-    Transaction.signTransaction(this, senderWallet);
+    senderOutput.ledgerEntry.token = senderOutput.ledgerEntry.token - amount;
+    senderOutput.ledgerEntry.flow = senderOutput.ledgerEntry.flow + amount;
+    this.output.push({ ledgerEntry: new FlowCurrency(amount, amount), address: recipient });
+    //Je zou kunnen de recipient updaten als er meerdere keren dezelde recipient gebruikt wordt,
+    //maar het lijkt me beter dat hier niet te doen.
+    this.input = Transaction.createInput(senderWallet);
+    //Transaction.signTransaction(this, senderWallet);
 
     return this;
   }
 
-  static transactionWithOutputs(senderWallet, outputs) {
-    const transaction = new this();
-    transaction.outputs.push(...outputs);
-    Transaction.signTransaction(transaction, senderWallet);
-    return transaction;
+
+  createInput(senderWallet) {
+    return {
+      time: Date.now(),
+      tokenTotals: senderWallet.balance.token,
+      address: senderWallet.publicKey,
+      signature: senderWallet.sign(CryptoUtil.hash(this.output))
+    }//let op voor de volgorde van de outputs vooraleer je ze door de signature procedure gaat sturen!!!
   }
 
-  static newTransaction(senderWallet, recipient, amount) {
-    if (amount > senderWallet.balance) {
-      console.log(`Amount: ${amount} exceeds balance.`);
+  verifyTransaction() {
+    const outputTotalToken = this.output.reduce((total, output) => {
+      return total + output.ledgerEntry.token;
+    }, 0);
+
+    if (transaction.input.tokenTotals !== outputTotalToken) {
+      console.log(`Invalid transaction from ${transaction.input.address}.`);
       return;
     }
 
-    return Transaction.transactionWithOutputs(senderWallet, [
-      { amount: senderWallet.balance - amount, address: senderWallet.publicKey },
-      { amount, address: recipient }
-    ]);
+    if (!ChainUtil.verifySignature(
+      this.input.address,
+      this.input.signature,
+      CryptoUtil.hash(this.output)
+    )) {
+      console.log(`Invalid signature from ${transaction.input.address}.`);
+      return;
+    };
+    return true;
   }
+
+
+  static createOutput(senderWallet, recipient, amount) {
+    //we can use balance of the sender wallet
+    return [{ 
+      address: senderWallet.publicKey, 
+      ledgerEntry: new FlowCurrency(senderWallet.balance.token - amount, senderWallet.flow + amount)
+    }, {
+      address: recipient, 
+      ledgerEntry: new FlowCurrency(amount, amount)
+    }];
+  }
+
+
+  
+  
+  //functions copied from David Katz
 
   static rewardTransaction(minerWallet, blockchainWallet) {
     return Transaction.transactionWithOutputs(blockchainWallet, [{
       amount: MINING_REWARD, address: minerWallet.publicKey
     }]);
   }
-
-  static signTransaction(transaction, senderWallet) {
-    transaction.input = {
-      timestamp: Date.now(),
-      amount: senderWallet.balance,
-      address: senderWallet.publicKey,
-      signature: senderWallet.sign(ChainUtil.hash(transaction.outputs))
-    }
-  }
-
-  static verifyTransaction(transaction) {
-    return ChainUtil.verifySignature(
-      transaction.input.address,
-      transaction.input.signature,
-      ChainUtil.hash(transaction.outputs)
-    );
-  }
+  
+  
 }
 
 module.exports = Transaction;

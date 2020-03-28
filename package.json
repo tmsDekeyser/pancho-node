@@ -10,7 +10,7 @@
     "dev": "nodemon ./app"
   },
   "keywords": [],
-  "author": "",
+  "author": "Thomas Dekeyser",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
