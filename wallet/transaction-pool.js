@@ -22,7 +22,7 @@ class TransactionPool {
   //Would it not be more interesting to look for invalid transactions?
   validTransactions() {
     return this.transactions.filter(transaction => {
-      if (transaction.verifyTransaction()){
+      if (Transaction.verifyTransaction(transaction)){
         return transaction;
       };
     });

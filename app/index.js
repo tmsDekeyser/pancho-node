@@ -9,7 +9,7 @@ const Miner = require('./miner');
 const bc = new Blockchain();
 const wallet = new Wallet();
 const tp = new TransactionPool();
-const p2pServer = new P2pServer(bc);
+const p2pServer = new P2pServer(bc, tp);
 const miner = new Miner(bc, tp, wallet, p2pServer);
 const app = express();
 
@@ -52,7 +52,7 @@ app.get('/transactions', (req, res) => {
   app.get('/mine-transactions', (req, res) => {
     const block = miner.mine();
     console.log(`New block added: ${block.toString()}`);
-    res.redirect('/blocks');
+    res.redirect('/blockchain');
   });
   
   app.get('/public-key', (req, res) => {

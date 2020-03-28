@@ -45,41 +45,45 @@ class Wallet {
       let balance = this.balance;
       let txList = [];
       let lastTx = null;
-    
-      do {
-        let i = blockchain.chain.length - 1;
-        let block = blockchain.chain[i];
+      
+      if (blockchain.chain.length > 1){
+        do {
+          let i = blockchain.chain.length - 1;
+          let block = blockchain.chain[i];
 
-        block.filter(tx => {
-          if (tx.input.address === this.publicKey) {
-            lastTx = tx;
-          };
+          block.data.filter(tx => {
+            if (tx.input.address === this.publicKey) {
+              lastTx = tx;
+            };
 
-          for (let j = 0; j < tx.output.length; j++) {
-            let entry = tx.output[j];
+            for (let j = 0; j < tx.output.length; j++) {
+              let entry = tx.output[j];
 
+              if (entry.address === this.publicKey) {
+                txList.push(tx);
+                break; // to avoid pushing the same transaction to the txList twice.
+              }
+            };
+            
+          });
+          i--;
+        } while (lastTx == 0 && i > 0);
+      }
+
+      if (lastTx == 0) {
+        const senderOutput = lastTx.output.find(entry => entry.address === this.publicKey);
+        let receivedTokens= 0;
+        txList.forEach(tx => {
+          tx.output.forEach(entry => {
             if (entry.address === this.publicKey) {
-              txList.push(tx);
-              break; // to avoid pushing the same transaction to the txList twice.
-            }
-          };
-          
+              receivedTokens += entry.ledgerEntry.token;
+            };
+          });
         });
-        i--;
-      } while (lastTx == 0);
-
-      const senderOutput = lastTx.output.find(entry => entry.address === this.publicKey);
-      let receivedTokens= 0;
-      txList.forEach(tx => {
-        tx.output.forEach(entry => {
-          if (entry.address === this.publicKey) {
-            receivedTokens += entry.ledgerEntry.token;
-          };
-        });
-      });
-
-      balance.token = senderOutput.ledgerEntry.token  + receivedTokens;
-      balance.flow = senderOutput.ledgerEntry.flow + receivedTokens;
+    
+        balance.token = senderOutput.ledgerEntry.token  + receivedTokens;
+        balance.flow = senderOutput.ledgerEntry.flow + receivedTokens;
+      }
 
       return balance;
 

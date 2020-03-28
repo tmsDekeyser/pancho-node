@@ -1,11 +1,12 @@
 const CryptoUtil = require('../crypto-util');
 const FlowCurrency = require('./flow-currency');
+const { MINING_REWARD} = require('../config');
 
 class Transaction {
   constructor(senderWallet, recipient, amount) {
     this.id = CryptoUtil.id();
     this.output = Transaction.createOutput(senderWallet, recipient, amount);
-    this.input = Transaction.createInput(senderWallet);
+    this.input = this.createInput(senderWallet);
   }
 
   
@@ -22,7 +23,7 @@ class Transaction {
     this.output.push({ ledgerEntry: new FlowCurrency(amount, amount), address: recipient });
     //Je zou kunnen de recipient updaten als er meerdere keren dezelde recipient gebruikt wordt,
     //maar het lijkt me beter dat hier niet te doen.
-    this.input = Transaction.createInput(senderWallet);
+    this.input = this.createInput(senderWallet);
     //Transaction.signTransaction(this, senderWallet);
 
     return this;
@@ -38,22 +39,22 @@ class Transaction {
     }//let op voor de volgorde van de outputs vooraleer je ze door de signature procedure gaat sturen!!!
   }
 
-  verifyTransaction() {
-    const outputTotalToken = this.output.reduce((total, output) => {
+  static verifyTransaction(tx) {
+    const outputTotalToken = tx.output.reduce((total, output) => {
       return total + output.ledgerEntry.token;
     }, 0);
 
-    if (transaction.input.tokenTotals !== outputTotalToken) {
-      console.log(`Invalid transaction from ${transaction.input.address}.`);
+    if (tx.input.tokenTotals !== outputTotalToken) {
+      console.log(`Invalid transaction from ${tx.input.address}.`);
       return;
     }
 
-    if (!ChainUtil.verifySignature(
-      this.input.address,
-      this.input.signature,
-      CryptoUtil.hash(this.output)
+    if (!CryptoUtil.verifySignature(
+      tx.input.address,
+      tx.input.signature,
+      CryptoUtil.hash(tx.output)
     )) {
-      console.log(`Invalid signature from ${transaction.input.address}.`);
+      console.log(`Invalid signature from ${tx.input.address}.`);
       return;
     };
     return true;
@@ -72,14 +73,9 @@ class Transaction {
   }
 
 
-  
-  
   //functions copied from David Katz
-
   static rewardTransaction(minerWallet, blockchainWallet) {
-    return Transaction.transactionWithOutputs(blockchainWallet, [{
-      amount: MINING_REWARD, address: minerWallet.publicKey
-    }]);
+    return new Transaction(blockchainWallet, minerWallet.publicKey, MINING_REWARD)
   }
   
   

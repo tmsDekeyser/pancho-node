@@ -1,9 +1,12 @@
 const EC = require('elliptic').ec;
-const uuidV1 = require('uuid/v1');
+const SHA256 = require('crypto-js/sha256');
+const uuidV1 = require('uuid').v1; //deprecated
+const ec = new EC('secp256k1');
 
 class CryptoUtil {
     static genKeyPair() {
-        return EC.KeyPair();
+        
+        return ec.genKeyPair();
     }
 
     static id() {
