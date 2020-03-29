@@ -47,6 +47,21 @@ class Blockchain{
         return true;
     }
 
+    knownAddresses() {
+        let knownAddresses = new Set();
+        for (let i = 1; i < this.chain.length; i++) {
+            const block = this.chain[i];
+            block.data.forEach(tx => {
+                tx.output.forEach(entry => {
+                    //console.log(entry.address);
+                    knownAddresses.add(entry.address);
+                });
+            });
+
+        };
+        return knownAddresses;
+    }
+
 
 };
 
