@@ -61,7 +61,7 @@ app.get('/transactions', (req, res) => {
   });
 
   app.get('/known-addresses', (req, res) => {
-    console.log(bc.knownAddresses());
+    //console.log(bc.knownAddresses());
     addressArray = Array.from(bc.knownAddresses());
     res.send(addressArray);
   });

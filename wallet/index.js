@@ -69,7 +69,7 @@ class Wallet {
           i--;
         } while (lastTx == 0 && i > 0);
       }
-      console.log(JSON.stringify(lastTx));
+      //console.log(JSON.stringify(lastTx));
       if (lastTx !== null) {
         const senderOutput = lastTx.output.find(entry => entry.address === this.publicKey);
         let receivedTokens= 0;
@@ -89,10 +89,10 @@ class Wallet {
 
     }
   
-    static blockchainWallet() {
-      const blockchainWallet = new this();
-      blockchainWallet.address = 'blockchain-wallet';
-      return blockchainWallet;
+    static bankWallet() {
+      const bankWallet = new this();
+      bankWallet.publicKey = 'DIVIDEND_BANK';
+      return bankWallet;
     }  
 }
 

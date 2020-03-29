@@ -1,6 +1,6 @@
 const CryptoUtil = require('../crypto-util');
 const FlowCurrency = require('./flow-currency');
-const { MINING_REWARD} = require('../config');
+const { MINING_REWARD, DIVIDEND} = require('../config');
 
 class Transaction {
   constructor(senderWallet, recipient, amount) {
@@ -11,22 +11,46 @@ class Transaction {
 
   
   update(senderWallet, recipient, amount) {
+    if (senderWallet.publicKey === 'DIVIDEND_BANK') {
+      return this.updateDividend(senderWallet, recipient, amount);
+    } else {
+    
+      const senderOutput = this.output.find(output => output.address === senderWallet.publicKey);
+
+      if (amount > senderOutput.ledgerEntry.token) {
+        console.log(`Amount: ${amount} exceeds balance.`);
+        return;
+      }
+
+      senderOutput.ledgerEntry.token = senderOutput.ledgerEntry.token - amount;
+      senderOutput.ledgerEntry.flow = senderOutput.ledgerEntry.flow + amount;
+      this.output.push({ ledgerEntry: new FlowCurrency(amount, amount), address: recipient });
+      //Je zou kunnen de recipient updaten als er meerdere keren dezelde recipient gebruikt wordt,
+      //maar het lijkt me beter dat hier niet te doen.
+      this.input = this.createInput(senderWallet);
+      //Transaction.signTransaction(this, senderWallet);
+
+      return this;
+    }
+  }
+
+  updateDividend(senderWallet, recipient, amount) {
     const senderOutput = this.output.find(output => output.address === senderWallet.publicKey);
 
-    if (amount > senderOutput.ledgerEntry.token) {
-      console.log(`Amount: ${amount} exceeds balance.`);
-      return;
-    }
+      if (amount > senderOutput.ledgerEntry.token) {
+        console.log(`Amount: ${amount} exceeds balance.`);
+        return;
+      }; // this should not happen
 
-    senderOutput.ledgerEntry.token = senderOutput.ledgerEntry.token - amount;
-    senderOutput.ledgerEntry.flow = senderOutput.ledgerEntry.flow + amount;
-    this.output.push({ ledgerEntry: new FlowCurrency(amount, amount), address: recipient });
-    //Je zou kunnen de recipient updaten als er meerdere keren dezelde recipient gebruikt wordt,
-    //maar het lijkt me beter dat hier niet te doen.
-    this.input = this.createInput(senderWallet);
-    //Transaction.signTransaction(this, senderWallet);
+      senderOutput.ledgerEntry.token = senderOutput.ledgerEntry.token - amount;
+      senderOutput.ledgerEntry.flow = 0;
+      this.output.push({ ledgerEntry: new FlowCurrency(amount, 0), address: recipient });
+      //Je zou kunnen de recipient updaten als er meerdere keren dezelde recipient gebruikt wordt,
+      //maar het lijkt me beter dat hier niet te doen.
+      this.input = this.createInput(senderWallet);
+      //Transaction.signTransaction(this, senderWallet);
 
-    return this;
+      return this;
   }
 
 
@@ -62,20 +86,53 @@ class Transaction {
 
 
   static createOutput(senderWallet, recipient, amount) {
-    //we can use balance of the sender wallet
+    if (senderWallet.publicKey === 'DIVIDEND_BANK') {
+      return Transaction.createDividendOutput(senderWallet, recipient, amount);
+    } else {
+      //we can use balance of the sender wallet
+      return [{ 
+        address: senderWallet.publicKey, 
+        ledgerEntry: new FlowCurrency(senderWallet.balance.token - amount, senderWallet.balance.flow + amount)
+      }, {
+        address: recipient, 
+        ledgerEntry: new FlowCurrency(amount, amount)
+      }];
+    }
+  }
+
+  static createDividendOutput(senderWallet, recipient, amount) {
     return [{ 
-      address: senderWallet.publicKey, 
-      ledgerEntry: new FlowCurrency(senderWallet.balance.token - amount, senderWallet.balance.flow + amount)
+      address: senderWallet.publicKey,  // can I leave this out?
+      ledgerEntry: new FlowCurrency(senderWallet.balance.token - amount, 0)
     }, {
       address: recipient, 
-      ledgerEntry: new FlowCurrency(amount, amount)
+      ledgerEntry: new FlowCurrency(amount, 0)
     }];
   }
 
 
   //functions copied from David Katz
-  static rewardTransaction(minerWallet, blockchainWallet) {
-    return new Transaction(blockchainWallet, minerWallet.publicKey, MINING_REWARD)
+  static dividendTransaction(bankWallet, blockchain) {
+    let knownAddresses = blockchain.knownAddresses();
+    knownAddresses.delete(bankWallet.publicKey);
+    let dividendTxArray = [];
+    bankWallet.balance.token = knownAddresses.size * DIVIDEND;
+
+    for (let item of knownAddresses) {
+      if (dividendTxArray.length < 1) {
+        dividendTxArray.push( new Transaction(bankWallet, item, DIVIDEND) );
+        console.log(dividendTxArray);
+      } else {
+        let tx = dividendTxArray[0];
+        //console.log(JSON.stringify(tx));
+        dividendTxArray.pop();
+        dividendTxArray.push(tx.update(bankWallet, item, DIVIDEND));
+      };
+      
+    };
+
+    return dividendTxArray[0];
+    
   }
   
   
