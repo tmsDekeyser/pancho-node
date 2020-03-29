@@ -22,13 +22,14 @@ app.use(bodyParser.json());
 
 //API endpoints
 app.get("/", (req, res) => {
-    res.send("This is the landing page for the pancho API!");
+    res.send("This is the landing page for the pancho API!"); //Add HTML landing page later
 });
 
 app.get("/blockchain", (req, res) => {
     res.json(bc);
 });
 
+//'/mine' endpoint has been upgraded to '/mine-transactions' after adding wallet/transactions functionality
 app.post("/mine", (req, res) => {
     const minedBlock = bc.addBlock(req.body.data);
     console.log("A new block was mined and added to the blockchain!");
@@ -55,8 +56,8 @@ app.get('/transactions', (req, res) => {
     res.redirect('/blockchain');
   });
   
-  app.get('/public-key', (req, res) => {
-    res.json({ publicKey: wallet.publicKey });
+  app.get('/wallet-info', (req, res) => {
+    res.json({ balance: wallet.calculateBalance(bc), publicKey: wallet.publicKey });
   });
 
   app.get('/known-addresses', (req, res) => {

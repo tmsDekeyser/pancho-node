@@ -65,7 +65,7 @@ class Transaction {
     //we can use balance of the sender wallet
     return [{ 
       address: senderWallet.publicKey, 
-      ledgerEntry: new FlowCurrency(senderWallet.balance.token - amount, senderWallet.flow + amount)
+      ledgerEntry: new FlowCurrency(senderWallet.balance.token - amount, senderWallet.balance.flow + amount)
     }, {
       address: recipient, 
       ledgerEntry: new FlowCurrency(amount, amount)

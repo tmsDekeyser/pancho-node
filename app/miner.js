@@ -11,14 +11,14 @@ class Miner {
   }
 
   mine() {
-    const validTransactions = this.transactionPool.validTransactions();
+    const validTransactions = this.transactionPool.validTransactions(); //make improvements to allow for selection of tx
     validTransactions.push(
       Transaction.rewardTransaction(this.wallet, Wallet.blockchainWallet()) // to be updated with dividend transaction
     );
     const block = this.blockchain.addBlock(validTransactions);
     this.p2pServer.broadcastChain();
     this.transactionPool.clear();
-    this.p2pServer.broadcastClearTransactions();
+    this.p2pServer.broadcastClearTransactions(); //I don't like this here: or change the clear() fucntion in tp_pool
 
     return block;
   }

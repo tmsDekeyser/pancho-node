@@ -59,7 +59,7 @@ class Wallet {
             for (let j = 0; j < tx.output.length; j++) {
               let entry = tx.output[j];
 
-              if (entry.address === this.publicKey) {
+              if (entry.address === this.publicKey && tx !== lastTx) {
                 txList.push(tx);
                 break; // to avoid pushing the same transaction to the txList twice.
               }
@@ -69,8 +69,8 @@ class Wallet {
           i--;
         } while (lastTx == 0 && i > 0);
       }
-
-      if (lastTx == 0) {
+      console.log(JSON.stringify(lastTx));
+      if (lastTx !== null) {
         const senderOutput = lastTx.output.find(entry => entry.address === this.publicKey);
         let receivedTokens= 0;
         txList.forEach(tx => {
