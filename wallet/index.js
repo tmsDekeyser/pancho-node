@@ -42,49 +42,69 @@ class Wallet {
     }
   
     calculateBalance(blockchain) {
-      let balance = this.balance;
+      let balance = new FlowCurrency(STARTING_BALANCE,0);
       let txList = [];
-      let lastTx = null;
+      let lastTx=0;
+      let i = blockchain.chain.length - 1;;
       
       if (blockchain.chain.length > 1){
         do {
-          let i = blockchain.chain.length - 1;
           let block = blockchain.chain[i];
 
           block.data.filter(tx => {
             if (tx.input.address === this.publicKey) {
               lastTx = tx;
+              console.log("lastTx: ")
+              console.log(lastTx);
             };
 
             for (let j = 0; j < tx.output.length; j++) {
               let entry = tx.output[j];
 
-              if (entry.address === this.publicKey && tx !== lastTx) {
+              if ((entry.address === this.publicKey) && (tx !== lastTx)) {
                 txList.push(tx);
-                break; // to avoid pushing the same transaction to the txList twice.
+                //break; // to avoid pushing the same transaction to the txList twice.
               }
             };
             
           });
           i--;
-        } while (lastTx == 0 && i > 0);
-      }
-      //console.log(JSON.stringify(lastTx));
-      if (lastTx !== null) {
-        const senderOutput = lastTx.output.find(entry => entry.address === this.publicKey);
-        let receivedTokens= 0;
-        txList.forEach(tx => {
-          tx.output.forEach(entry => {
-            if (entry.address === this.publicKey) {
-              receivedTokens += entry.ledgerEntry.token;
-            };
+        } while ((lastTx == 0) && (i > 0));
+        
+        if (lastTx) {
+          const senderOutput = lastTx.output.find(entry => entry.address === this.publicKey);
+          let receivedTokens =0;
+          let receivedFlow = 0;
+          txList.forEach(tx => {
+            tx.output.forEach(entry => {
+              if (entry.address === this.publicKey) {
+                receivedTokens += entry.ledgerEntry.token
+                receivedFlow += entry.ledgerEntry.flow;
+              };
+            });
           });
-        });
-    
-        balance.token = senderOutput.ledgerEntry.token  + receivedTokens;
-        balance.flow = senderOutput.ledgerEntry.flow + receivedTokens;
-      }
+      
+          balance.token = senderOutput.ledgerEntry.token  + receivedTokens;
+          balance.flow = senderOutput.ledgerEntry.flow + receivedFlow;
 
+        } else {
+          let receivedTokens = 0;
+          let receivedFlow = 0;
+          if (txList !== []){
+            txList.forEach(tx => {
+              tx.output.forEach(entry => {
+                if (entry.address === this.publicKey) {
+                  receivedTokens += entry.ledgerEntry.token;
+                  receivedFlow += entry.ledgerEntry.flow;
+                };
+              });
+            });
+          };
+
+          balance.token += receivedTokens;
+          balance.flow += receivedFlow;
+        }
+      }
       return balance;
 
     }

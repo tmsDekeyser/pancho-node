@@ -121,7 +121,7 @@ class Transaction {
     for (let item of knownAddresses) {
       if (dividendTxArray.length < 1) {
         dividendTxArray.push( new Transaction(bankWallet, item, DIVIDEND) );
-        console.log(dividendTxArray);
+        //console.log(dividendTxArray);
       } else {
         let tx = dividendTxArray[0];
         //console.log(JSON.stringify(tx));
