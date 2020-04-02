@@ -1,6 +1,6 @@
 const Wallet = require('../wallet');
-
-const Transaction = require('../wallet/transaction');
+const { DIVIDEND } = require('../config');
+const DividendTx = require('../wallet/dividend-tx');
 
 class Miner {
   constructor(blockchain, transactionPool, wallet, pubsub) {
@@ -12,9 +12,9 @@ class Miner {
 
   mine() {
     const validTransactions = this.transactionPool.validTransactions(); //make improvements to allow for selection of tx
-    if (Transaction.dividendTransaction(Wallet.bankWallet(), this.blockchain)){
-      validTransactions.push(Transaction.dividendTransaction(Wallet.bankWallet(), this.blockchain));
-    }
+    if (Miner.dividendTransaction(Wallet.bankWallet(), this.blockchain)){
+      validTransactions.push(Miner.dividendTransaction(Wallet.bankWallet(), this.blockchain));
+    };
     
     const block = this.blockchain.addBlock(validTransactions);
     
@@ -23,6 +23,29 @@ class Miner {
     this.pubsub.broadcastClearTransactions(); //I don't like this here: or change the clear() fucntion in tp_pool
 
     return block;
+  };
+
+  static dividendTransaction(bankWallet, blockchain) {
+    let knownAddresses = blockchain.knownAddresses();
+    knownAddresses.delete(bankWallet.publicKey);
+    
+    let dividendTx;
+    
+    bankWallet.balance.token = knownAddresses.size * DIVIDEND;
+
+    for (let item of knownAddresses) {
+      if (!dividendTx) {
+        //dividendTx = new Transaction(bankWallet, item, DIVIDEND);
+        dividendTx = new DividendTx(bankWallet, item);
+      } else {
+        //dividendTx.update(bankWallet, item, DIVIDEND);
+        dividendTx.update(bankWallet, item);
+      };
+      
+    };
+
+    return dividendTx;
+    
   }
 }
 
