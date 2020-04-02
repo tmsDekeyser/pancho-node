@@ -1,5 +1,6 @@
 const { STARTING_BALANCE } = require('../config');
 const CryptoUtil = require('../util/crypto-util');
+const cryptoHash = require('../util/crypto-hash');
 const Transaction = require('./transaction');
 const FlowCurrency = require('./flow-currency');
 
@@ -17,8 +18,8 @@ class Wallet {
         );
     }
 
-    sign(dataHash) {
-        return this.keyPair.sign(dataHash);
+    sign(data) {
+        return this.keyPair.sign(cryptoHash(data));
       }
     
     createTransaction(recipient, amount, blockchain, transactionPool) {

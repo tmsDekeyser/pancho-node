@@ -60,8 +60,8 @@ class Transaction {
       time: Date.now(),
       tokenTotals: senderWallet.balance.token,
       address: senderWallet.publicKey,
-      signature: senderWallet.sign(cryptoHash(this.output))
-    }//let op voor de volgorde van de outputs vooraleer je ze door de signature procedure gaat sturen!!!
+      signature: senderWallet.sign(this.output)
+    };
   }
 
   static verifyTransaction(tx) {
@@ -72,12 +72,12 @@ class Transaction {
     if (tx.input.tokenTotals !== outputTotalToken) {
       console.log(`Invalid transaction from ${tx.input.address}.`);
       return;
-    }
+    };
 
     if (!CryptoUtil.verifySignature(
       tx.input.address,
       tx.input.signature,
-      cryptoHash(tx.output)
+      tx.output
     )) {
       console.log(`Invalid signature from ${tx.input.address}.`);
       return;
@@ -112,11 +112,12 @@ class Transaction {
   }
 
 
-  //functions copied from David Katz
   static dividendTransaction(bankWallet, blockchain) {
     let knownAddresses = blockchain.knownAddresses();
     knownAddresses.delete(bankWallet.publicKey);
+    
     let dividendTxArray = [];
+    
     bankWallet.balance.token = knownAddresses.size * DIVIDEND;
 
     for (let item of knownAddresses) {

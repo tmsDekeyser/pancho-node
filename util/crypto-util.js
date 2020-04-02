@@ -1,4 +1,5 @@
 const EC = require('elliptic').ec;
+const cryptoHash = require('./crypto-hash');
 const uuidV1 = require('uuid').v1; //deprecated
 const ec = new EC('secp256k1');
 
@@ -12,8 +13,8 @@ class CryptoUtil {
         return uuidV1();
     }
     
-    static verifySignature(publicKey, signature, dataHash) {
-        return ec.keyFromPublic(publicKey, 'hex').verify(dataHash, signature);
+    static verifySignature(publicKey, signature, data) {
+        return ec.keyFromPublic(publicKey, 'hex').verify(cryptoHash(data), signature);
     }
     
 }
