@@ -15,12 +15,12 @@ class Blockchain{
     replaceChain (incomingChain) {
         //incomingChain is a chain (array) of blocks, not a Blockchain object!
         if (incomingChain.length <= this.chain.length) {
-            console.log("The incoming chain is not longer than the current Blockchain.");
+            console.error("The incoming chain is not longer than the current Blockchain.");
             return;
         }
 
         if (Blockchain.isValidChain(incomingChain) !== true) {
-            console.log("The incoming chain is not a valid Blockchain.");
+            console.error("The incoming chain is not a valid Blockchain.");
             return;
         }
 
@@ -38,7 +38,10 @@ class Blockchain{
         for (let i=1; i < incomingChain.length; i++) {
             const block = incomingChain[i];
             const lastBlock = incomingChain[i-1];
-            if (block.lastHash !== lastBlock.hash || Block.blockHash(block) !== block.hash) {
+            const { timestamp, lastHash, nonce, difficulty, data } = block;
+
+            if (block.lastHash !== lastBlock.hash || 
+                cryptoHash(timestamp, lastHash, nonce, difficulty, data) !== block.hash) {
                 console.log("Problemen met hashes");
                 return false;
             }
@@ -63,7 +66,7 @@ class Blockchain{
     }
 
 
-};
+}
 
 module.exports = Blockchain;
 
