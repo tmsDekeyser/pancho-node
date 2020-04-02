@@ -1,5 +1,5 @@
 const { STARTING_BALANCE } = require('../config');
-const CryptoUtil = require('../crypto-util');
+const CryptoUtil = require('../util/crypto-util');
 const Transaction = require('./transaction');
 const FlowCurrency = require('./flow-currency');
 
@@ -54,8 +54,8 @@ class Wallet {
           block.data.filter(tx => {
             if (tx.input.address === this.publicKey) {
               lastTx = tx;
-              console.log("lastTx: ")
-              console.log(lastTx);
+              //console.log("lastTx: ")
+              //console.log(lastTx);
             };
 
             for (let j = 0; j < tx.output.length; j++) {

@@ -7,17 +7,20 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev-test": "nodemon dev-test",
     "start": "node ./app",
-    "dev": "nodemon ./app"
+    "dev": "nodemon ./app",
+    "dev-peer": "cross-env GENERATE_PEER_PORT='true' nodemon ./app"
   },
   "keywords": [],
   "author": "Thomas Dekeyser",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cross-env": "^7.0.2",
     "crypto-js": "^4.0.0",
     "elliptic": "^6.5.2",
     "express": "^4.17.1",
     "pubnub": "^4.27.4",
+    "request": "^2.88.2",
     "uuid": "^7.0.2",
     "ws": "^7.2.3"
   }

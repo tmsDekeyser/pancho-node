@@ -1,5 +1,5 @@
 const { DIFFICULTY } = require('../config');
-const cryptoHash = require('./crypto-hash');
+const cryptoHash = require('../util/crypto-hash');
 
 class Block{
     constructor({ timestamp, lastHash, nonce, difficulty, hash, data }) {
@@ -42,9 +42,10 @@ class Block{
             hash = cryptoHash(time, lastBlock.hash, nonce, DIFFICULTY, data);
         } while (hash.substring(0, DIFFICULTY) !== '0'.repeat(DIFFICULTY));
 
-        return new this(time, lastBlock.hash, nonce, DIFFICULTY, hash, data );
+        return new this({ hash, nonce, data, timestamp: time, lastHash: lastBlock.hash, difficulty: DIFFICULTY } );
     }
 
 }
+
 
 module.exports = Block;

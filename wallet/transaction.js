@@ -1,4 +1,5 @@
-const CryptoUtil = require('../crypto-util');
+const CryptoUtil = require('../util/crypto-util');
+const cryptoHash = require('../util/crypto-hash');
 const FlowCurrency = require('./flow-currency');
 const { MINING_REWARD, DIVIDEND} = require('../config');
 
@@ -59,7 +60,7 @@ class Transaction {
       time: Date.now(),
       tokenTotals: senderWallet.balance.token,
       address: senderWallet.publicKey,
-      signature: senderWallet.sign(CryptoUtil.hash(this.output))
+      signature: senderWallet.sign(cryptoHash(this.output))
     }//let op voor de volgorde van de outputs vooraleer je ze door de signature procedure gaat sturen!!!
   }
 
@@ -76,7 +77,7 @@ class Transaction {
     if (!CryptoUtil.verifySignature(
       tx.input.address,
       tx.input.signature,
-      CryptoUtil.hash(tx.output)
+      cryptoHash(tx.output)
     )) {
       console.log(`Invalid signature from ${tx.input.address}.`);
       return;

@@ -3,11 +3,11 @@ const Wallet = require('../wallet');
 const Transaction = require('../wallet/transaction');
 
 class Miner {
-  constructor(blockchain, transactionPool, wallet, p2pServer) {
+  constructor(blockchain, transactionPool, wallet, pubsub) {
     this.blockchain = blockchain;
     this.transactionPool = transactionPool;
     this.wallet = wallet;
-    this.p2pServer = p2pServer;
+    this.pubsub = pubsub;
   }
 
   mine() {
@@ -18,9 +18,9 @@ class Miner {
     
     const block = this.blockchain.addBlock(validTransactions);
     
-    this.p2pServer.broadcastChain();
+    this.pubsub.broadcastChain();
     this.transactionPool.clear();
-    this.p2pServer.broadcastClearTransactions(); //I don't like this here: or change the clear() fucntion in tp_pool
+    this.pubsub.broadcastClearTransactions(); //I don't like this here: or change the clear() fucntion in tp_pool
 
     return block;
   }

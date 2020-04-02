@@ -1,4 +1,5 @@
 const Block = require('./block.js');
+const cryptoHash = require('../util/crypto-hash');
 
 class Blockchain{
     constructor () {
@@ -31,7 +32,7 @@ class Blockchain{
     static isValidChain(incomingChain) {
         //incomingChain is a chain (array) of blocks, not a Blockchain object!
         if (JSON.stringify(incomingChain[0]) !== JSON.stringify(Block.genisisBlock())) {
-            console.log("Problemen met genesis block.");
+            console.log("There is an issue with the genisis block.");
             return false;
         }
 
@@ -42,7 +43,7 @@ class Blockchain{
 
             if (block.lastHash !== lastBlock.hash || 
                 cryptoHash(timestamp, lastHash, nonce, difficulty, data) !== block.hash) {
-                console.log("Problemen met hashes");
+                console.log("There is an issue with the hashes.");
                 return false;
             }
         }
