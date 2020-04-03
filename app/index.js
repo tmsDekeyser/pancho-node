@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request'); // has been deprecated, seek alternative!!
+const path = require('path');
 
 const Blockchain = require('../blockchain');
 //const P2pServer = require('./p2p-server');
@@ -28,10 +29,11 @@ const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 //p2pServer.listen();
 
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 //API endpoints
 app.get("/", (req, res) => {
-    res.send("This is the landing page for the pancho API!"); //Add HTML landing page later
+    res.sendFile(path.join(__dirname, "../client/dist/index.html")); //Add HTML landing page later
 });
 
 app.get("/blockchain", (req, res) => {

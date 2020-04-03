@@ -23,7 +23,7 @@ class Block{
     };
 
     static genisisBlock() {
-        return new this({ time: 'Big Bang', 
+        return new this({ timestamp: 1000000, 
         lastHash : '-----', 
         nonce : 0, 
         difficulty : DIFFICULTY, 
