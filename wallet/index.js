@@ -31,7 +31,7 @@ class Wallet {
       }
   
       let transaction = transactionPool.existingTransaction(this.publicKey);
-  
+      console.log('Tx:', transaction)
       if (transaction) {
         transaction.update(this, recipient, amount);
       } else {

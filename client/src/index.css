@@ -1,5 +1,5 @@
 body {
-    background-color: #444;
+    background-color: #18A89C;
     color: #fff;
     text-align: center;
     font-size: 20px;
@@ -38,6 +38,6 @@ body {
   }
   
   a, a:hover {
-    color: #e66;
+    color: #FFC300;
     text-decoration: underline;
   }

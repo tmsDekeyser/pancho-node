@@ -36,7 +36,7 @@ class DividendTx extends Transaction {
           //maar het lijkt me beter dat hier niet te doen.
           this.input = this.createInput(senderWallet);
     
-          return this;
+          //return this;
       };
 
 

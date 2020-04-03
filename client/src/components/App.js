@@ -23,9 +23,10 @@ class App extends Component {
                 <br />
                 <div className="WalletInfo">
                 <div>Address: {publicKey}</div>
-                <div>Balance</div>
-                <div>tokens: {token}</div>
-                <div>flow: {flow}</div>
+                <br />
+                <div><h4>Balance</h4></div>
+                <div><em>tokens:</em> {token}</div>
+                <div><em>flow:</em> {flow}</div>
                 </div>
                 <br />
                 <Blockchain />

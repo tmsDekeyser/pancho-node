@@ -30,6 +30,7 @@
     "parcel-bundler": "^1.12.4",
     "pubnub": "^4.27.4",
     "react": "^16.13.1",
+    "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1",
     "request": "^2.88.2",
     "uuid": "^7.0.2",

@@ -31,7 +31,7 @@ class Transaction {
       this.input = this.createInput(senderWallet);
       //Transaction.signTransaction(this, senderWallet);
 
-      return this;
+      //return this;
     }
   }
 
