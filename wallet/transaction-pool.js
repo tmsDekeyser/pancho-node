@@ -10,6 +10,7 @@ class TransactionPool {
 
     if (transactionWithId) {
       this.transactions[this.transactions.indexOf(transactionWithId)] = transaction;
+      //console.log('tx with ID', transactionWithId);
     } else {
       this.transactions.push(transaction);
     }

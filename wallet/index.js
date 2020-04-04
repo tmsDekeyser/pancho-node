@@ -31,7 +31,7 @@ class Wallet {
       }
   
       let transaction = transactionPool.existingTransaction(this.publicKey);
-      console.log('Tx:', transaction)
+      //console.log('existing Tx:', transaction)
       if (transaction) {
         transaction.update(this, recipient, amount);
       } else {
@@ -109,12 +109,32 @@ class Wallet {
       return balance;
 
     }
-  
+    
+    static transactionFromData(txData) {
+      let transaction = new Transaction(new Wallet(),'bar', 0);
+      //console.log('Transaction', transaction);
+      const { id, output, input } = txData;
+      transaction.id = id;
+      transaction.output = output;
+      transaction.input = input;
+      //console.log('Transaction after adjusting', transaction);
+      transaction.output.forEach(output => {
+        let { token, flow } = output.ledgerEntry;
+        output.ledgerEntry = new FlowCurrency(token, flow);
+      });
+      //console.log('Transaction after for each', transaction);
+      return transaction;
+    }
+
     static bankWallet() {
       const bankWallet = new this();
       bankWallet.publicKey = 'DIVIDEND_BANK';
       return bankWallet;
     }  
 }
-
+// const wallet = new Wallet();
+// const txTest = new Transaction(wallet, 'foo', 15);
+// console.log('txTest', txTest);
+// txTest.update(wallet, 'foo', 25)
+// console.log('txTest updated', txTest);
 module.exports = Wallet;

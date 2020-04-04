@@ -1,4 +1,5 @@
 const PubNub = require('pubnub');
+const Wallet = require('../wallet');
 
 const keySet = {
     publishKey: 'pub-c-3ae6dace-fc08-4626-b254-d35955b15049',
@@ -39,7 +40,8 @@ class PubSub {
                         this.blockchain.replaceChain(parsedMessage);
                         break;
                     case CHANNELS.TRANSACTION :
-                        this.transactionPool.updateOrAddTransaction(parsedMessage);
+                        const transaction = Wallet.transactionFromData(parsedMessage);
+                        this.transactionPool.updateOrAddTransaction(transaction);
                         break;
                     case CHANNELS.CLEAR_TX:
                         this.transactionPool.clear();

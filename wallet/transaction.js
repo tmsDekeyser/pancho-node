@@ -1,7 +1,7 @@
 const CryptoUtil = require('../util/crypto-util');
-const cryptoHash = require('../util/crypto-hash');
+//const cryptoHash = require('../util/crypto-hash');
 const FlowCurrency = require('./flow-currency');
-const { MINING_REWARD, DIVIDEND} = require('../config');
+//const { MINING_REWARD, DIVIDEND} = require('../config');
 
 class Transaction {
   constructor(senderWallet, recipient, amount) {
@@ -80,6 +80,7 @@ class Transaction {
     };
     return true;
   }
+
 
 }
 
