@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import Blockchain from './Blockchain';
+import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import logo from '../assets/logo.png'
 
 class App extends Component {
     state = { walletInfo: { publicKey: 'foobar', balance: { token: 1000, flow: 200}}};
 
     componentDidMount() {
-        fetch('http://localhost:3000/wallet-info')
+        fetch(`${document.location.origin}/wallet-info`)
         .then(response => response.json())
         .then(json => this.setState({ walletInfo: json }));
     }
@@ -19,7 +20,17 @@ class App extends Component {
             <div className='App'>
                 <img className='logo' src={logo}></img>
                 <br />
-                <div>Welcome to the pancho demo</div>
+                <div><h1>pancho demo</h1></div>
+                <br />
+                <div className="Button"><Link to='/blockchain'><Button variant="outline-warning">Blockchain</Button></Link></div>
+                <div className="Button"><Link to='/conduct-transaction'>
+                        <Button variant="outline-warning">Conduct Transaction</Button>
+                    </Link>
+                </div>
+                <div className="Button"><Link to='/transaction-pool'>
+                        <Button variant="outline-warning">Transaction Pool</Button>
+                    </Link>
+                </div>
                 <br />
                 <div className="WalletInfo">
                 <div>Address: {publicKey}</div>
@@ -29,7 +40,6 @@ class App extends Component {
                 <div><em>flow:</em> {flow}</div>
                 </div>
                 <br />
-                <Blockchain />
             </div>
             
         );

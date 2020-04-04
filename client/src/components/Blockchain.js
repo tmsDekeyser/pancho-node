@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import Block from './Block'
 
 class Blockchain extends Component {
     state = { blockchain: [] };
 
     componentDidMount() {
-        fetch('http://localhost:3000/blockchain')
+        fetch(`${document.location.origin}/blockchain`)
         .then(response => response.json())
         .then(json => this.setState({ blockchain: json.chain }));
     }
@@ -13,7 +15,9 @@ class Blockchain extends Component {
     render() {
         console.log(this.state.blockchain)
         return (
-            <div>
+            <div className="Blockchain">
+                <div className="Button"><Button variant="outline-warning"><Link to='/'>Homepage</Link></Button></div>
+                <br />
                 <h3>Blockchain</h3>
                 {
                     this.state.blockchain.map(block => {
