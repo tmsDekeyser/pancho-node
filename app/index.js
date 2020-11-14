@@ -36,42 +36,42 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/dist/index.html")); //Add HTML landing page later
 });
 
-app.get("/blockchain", (req, res) => {
+app.get("/api/blockchain", (req, res) => {
     res.json(bc);
 });
 
 //'/mine' endpoint has been upgraded to '/mine-transactions' after adding wallet/transactions functionality
-app.post("/mine", (req, res) => {
+app.post("/api/mine", (req, res) => {
     const minedBlock = bc.addBlock(req.body.data);
     console.log("A new block was mined and added to the blockchain!");
 
     pubsub.broadcastChain();
 
-    res.redirect("/blockchain");
+    res.redirect("/api/blockchain");
 });
 
-app.get('/transactions', (req, res) => {
+app.get('/api/transactions', (req, res) => {
     res.json(tp.transactions);
   });
   
-app.post('/transact', (req, res) => {
+app.post('/api/transact', (req, res) => {
   const { recipient, amount } = req.body;
   const transaction = wallet.createTransaction(recipient, amount, bc, tp);
   pubsub.broadcastTransaction(transaction);
-  res.redirect('/transactions');
+  res.redirect('/api/transactions');
 });
   
-app.get('/mine-transactions', (req, res) => {
+app.get('/api/mine-transactions', (req, res) => {
   const block = miner.mine();
   console.log(`New block added: ${block.toString()}`);
-  res.redirect('/blockchain');
+  res.redirect('/api/blockchain');
 });
 
-app.get('/wallet-info', (req, res) => {
+app.get('/api/wallet-info', (req, res) => {
   res.json({ balance: wallet.calculateBalance(bc), publicKey: wallet.publicKey });
 });
 
-app.get('/known-addresses', (req, res) => {
+app.get('/api/known-addresses', (req, res) => {
   //console.log(bc.knownAddresses());
   addressArray = Array.from(bc.knownAddresses());
   res.send(addressArray);

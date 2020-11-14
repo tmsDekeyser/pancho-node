@@ -10,13 +10,13 @@ class TransactionPool extends Component {
 
 
     fetchTransactionPoolArray = ()=> {
-        fetch(`${document.location.origin}/transactions`)
+        fetch(`${document.location.origin}/api/transactions`)
         .then(response => response.json())
         .then(json => this.setState({ transactionArray: json}));
     }
 
     fetchMineTransactions = () => {
-        fetch(`${document.location.origin}/mine-transactions`)
+        fetch(`${document.location.origin}/api/mine-transactions`)
           .then(response => {
             if (response.status === 200) {
               alert('success');
@@ -57,7 +57,7 @@ class TransactionPool extends Component {
                 }
                 <hr />
                 <Button variant="warning" onClick={this.fetchMineTransactions}>
-                    Mine the Transactions
+                    Mine the transactions in the pool
                 </Button>
             </div>
         )

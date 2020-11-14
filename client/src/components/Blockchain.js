@@ -7,7 +7,7 @@ class Blockchain extends Component {
     state = { blockchain: [] };
 
     componentDidMount() {
-        fetch(`${document.location.origin}/blockchain`)
+        fetch(`${document.location.origin}/api/blockchain`)
         .then(response => response.json())
         .then(json => this.setState({ blockchain: json.chain }));
     }
