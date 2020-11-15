@@ -1,5 +1,6 @@
 const PubNub = require('pubnub');
 const Wallet = require('../wallet');
+//Store keys in an untracked file in your local repository
 const keySet = require('./secretKey');
 
 
